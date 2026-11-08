@@ -5,13 +5,15 @@ import { HttpError } from '../utils/errors.js';
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
 export function copilotStatus() {
+  const keyCount = config.groqApiKeys.length;
   return {
-    enabled: Boolean(config.groqApiKey),
+    enabled: keyCount > 0,
     provider: 'AIRCUE Copilot',
-    model: config.groqApiKey ? config.groqModel : null,
-    reason: config.groqApiKey
+    model: keyCount ? config.groqModel : null,
+    keyCount,
+    reason: keyCount
       ? null
-      : 'AIRCUE Copilot is disabled because GROQ_API_KEY is not configured on the server. All other AIR CUE features work without it, and insights fall back to rule-based explanations of the loaded data.',
+      : 'AIRCUE Copilot is disabled because GROQ_API_KEYS (or GROQ_API_KEY) is not configured on the server. All other AIR CUE features work without it, and insights fall back to rule-based explanations of the loaded data.',
   };
 }
 
@@ -31,49 +33,87 @@ const SYSTEM_PROMPT = `You are the AIRCUE Copilot, embedded in the AIR CUE air-q
 ${GROUNDING_RULES}
 10. If the data timestamp is older than three hours, mention that the data may be stale.`;
 
+const RETRIABLE_GROQ_STATUSES = new Set([401, 403, 408, 409, 429, 500, 502, 503, 504]);
+let nextKeyIndex = 0;
+
+function mapGroqFailure(error) {
+  if (error instanceof HttpError) return error;
+  if (error?.status === 401 || error?.status === 403) {
+    return new HttpError(502, 'AI_AUTH_FAILED', 'All configured Groq API keys were rejected, so AIRCUE Copilot is unavailable.');
+  }
+  if (error?.status === 429) {
+    return new HttpError(503, 'AI_RATE_LIMITED', 'All configured Groq API keys are rate-limited right now. Try again in a moment.');
+  }
+  if (error?.code === 'UPSTREAM_TIMEOUT') {
+    return new HttpError(504, 'AI_TIMEOUT', 'The AI provider did not respond in time. Your dashboard data is unaffected.');
+  }
+  if (error?.status === 400) {
+    return new HttpError(502, 'AI_REQUEST_REJECTED', 'The AI provider rejected the request. Your dashboard data is unaffected.');
+  }
+  return new HttpError(502, 'AI_UNAVAILABLE', 'AIRCUE Copilot could not get a response from Groq. Your dashboard data is unaffected.');
+}
+
 export async function groqChat({ messages, temperature = 0.2, maxTokens = 550, timeout = 25000 }) {
-  if (!config.groqApiKey) {
+  const keys = config.groqApiKeys;
+  if (!keys.length) {
     throw new HttpError(503, 'AI_DISABLED', copilotStatus().reason);
   }
 
-  const payload = await fetchJson(GROQ_URL, {
-    provider: 'Groq',
-    timeout,
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${config.groqApiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: config.groqModel,
-      temperature,
-      // Groq's current OpenAI-compatible endpoint expects max_completion_tokens.
-      max_completion_tokens: maxTokens,
-      messages,
-    }),
-  }).catch((error) => {
-    if (error?.status === 401 || error?.status === 403) {
-      throw new HttpError(502, 'AI_AUTH_FAILED', 'Groq rejected the configured API key, so AIRCUE Copilot is unavailable.');
-    }
-    if (error?.status === 429) {
-      throw new HttpError(503, 'AI_RATE_LIMITED', 'The AI provider rate limit was reached. Try again in a moment.');
-    }
-    if (error?.code === 'UPSTREAM_TIMEOUT') {
-      throw new HttpError(504, 'AI_TIMEOUT', 'The AI provider did not respond in time. Your dashboard data is unaffected.');
-    }
-    throw error;
-  });
+  const start = nextKeyIndex % keys.length;
+  nextKeyIndex = (nextKeyIndex + 1) % keys.length;
+  let lastError = null;
 
-  const content = payload?.choices?.[0]?.message?.content?.trim();
-  if (!content) {
-    console.warn('[air-cue] Groq returned no message content.', {
-      finishReason: payload?.choices?.[0]?.finish_reason || 'unknown',
-      usage: payload?.usage || null,
-    });
-    throw new HttpError(502, 'AI_EMPTY_RESPONSE', 'The AI provider returned an empty answer. Please try again.');
+  for (let offset = 0; offset < keys.length; offset += 1) {
+    const keyIndex = (start + offset) % keys.length;
+    try {
+      const payload = await fetchJson(GROQ_URL, {
+        provider: 'Groq',
+        timeout,
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${keys[keyIndex]}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: config.groqModel,
+          temperature,
+          // Groq's current OpenAI-compatible endpoint expects max_completion_tokens.
+          max_completion_tokens: maxTokens,
+          messages,
+        }),
+      });
+
+      const content = payload?.choices?.[0]?.message?.content?.trim();
+      if (!content) {
+        lastError = new HttpError(
+          502,
+          'AI_EMPTY_RESPONSE',
+          'The AI provider returned an empty answer. Please try again.',
+        );
+        console.warn('[air-cue] Groq returned no message content.', {
+          attempt: offset + 1,
+          keys: keys.length,
+          finishReason: payload?.choices?.[0]?.finish_reason || 'unknown',
+          usage: payload?.usage || null,
+        });
+        continue;
+      }
+
+      return { content, model: payload.model || config.groqModel };
+    } catch (error) {
+      lastError = error;
+      const retriable =
+        RETRIABLE_GROQ_STATUSES.has(error?.status) ||
+        error?.code === 'UPSTREAM_TIMEOUT' ||
+        error?.code === 'UPSTREAM_UNREACHABLE';
+      if (!retriable) throw mapGroqFailure(error);
+      console.warn(
+        `[air-cue] Groq attempt ${offset + 1}/${keys.length} failed (${error?.status || error?.code || 'unknown'}); trying the next configured key.`,
+      );
+    }
   }
 
-  return { content, model: payload.model || config.groqModel };
+  throw mapGroqFailure(lastError);
 }
 
 export async function askCopilot({ question, context }) {

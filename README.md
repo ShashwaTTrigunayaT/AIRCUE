@@ -120,7 +120,8 @@ Copy `.env.example` to `.env`. All integrations are optional:
 | Variable | Purpose |
 | --- | --- |
 | `PORT` | API/production server port (default `5000`) |
-| `GROQ_API_KEY` | Enables AIRCUE Copilot chat and insights |
+| `GROQ_API_KEYS` | Comma/newline-separated Groq key pool; requests rotate keys and fall back to the next key on auth, rate-limit, 5xx or timeout failures |
+| `GROQ_API_KEY` | Single-key alternative, merged into `GROQ_API_KEYS` and deduplicated |
 | `GROQ_MODEL` | Groq model (default `openai/gpt-oss-120b`; verify in the Groq console) |
 | `OPENAQ_API_KEY` | Enables ground-level monitoring station observations |
 | `MONGODB_URI` | Enables MongoDB persistence for saved locations and alerts |
@@ -300,4 +301,6 @@ OpenStreetMap tile servers are used for the demo map and are not an unrestricted
 - Voice input/output requires a browser with the Web Speech API (notably Chrome or Edge) and microphone permission;
   other browsers retain the text-only Copilot.
 - The pollution leaderboard ranks modelled city-grid samples only; it is not a station-level ranking.
+- Multiple Groq keys improve resilience and spread requests across keys, but keys belonging to the same Groq
+  organization may share rate limits. This is a fallback mechanism, not a guaranteed increase in aggregate quota.
 - No visual screenshots are committed; capture them from the running app for submission materials.

@@ -165,9 +165,11 @@ summaries, and limitations.
 - label general knowledge separately,
 - avoid invented causes, diagnoses and safety guarantees.
 
-AI features are optional. Without `GROQ_API_KEY`, `/api/ai/assistant` returns a typed 503 and `/api/ai/insights`
-returns rule-based insights with `source: "rules"`. The key is read only on the server. Request timeout, token limits,
-rate limits and provider error mapping are implemented server-side.
+AI features are optional. Without `GROQ_API_KEYS` (or `GROQ_API_KEY`), `/api/ai/assistant` returns a typed 503 and
+`/api/ai/insights` returns rule-based insights with `source: "rules"`. Keys are read only on the server.
+`GROQ_API_KEYS` accepts a comma/newline-separated pool; each request starts on the next key and falls back once through
+the remaining keys on auth, rate-limit, 5xx, timeout or empty-response failures. Request timeout, token limits, rate
+limits and provider error mapping are implemented server-side.
 
 ## Error handling and UX states
 

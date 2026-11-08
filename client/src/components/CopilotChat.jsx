@@ -202,7 +202,7 @@ export default function CopilotChat({ location, current, aiStatus }) {
 
       {disabled ? (
         <InlineNotice tone="warning" title="AIRCUE Copilot is not configured">
-          {aiStatus?.reason || 'Set GROQ_API_KEY on the server to enable AIRCUE Copilot.'} The dashboard, map, forecast,
+          {aiStatus?.reason || 'Set GROQ_API_KEYS (or GROQ_API_KEY) on the server to enable AIRCUE Copilot.'} The dashboard, map, forecast,
           Clean Air Finder and alerts all work without it.
         </InlineNotice>
       ) : null}

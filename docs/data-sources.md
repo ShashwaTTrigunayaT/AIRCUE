@@ -167,6 +167,9 @@ Docs: https://console.groq.com/docs · OpenAI-compatible endpoint:
 
 - The model is configurable (`GROQ_MODEL`, default candidate `openai/gpt-oss-120b`); verify current model names,
   availability, rate limits and pricing in the Groq console before deployment.
+- `GROQ_API_KEYS` accepts a comma/newline-separated key pool. Requests rotate keys, and a rejected, rate-limited,
+  timed-out or failed key falls back to the next one. Keys in the same Groq organization may share limits, so this is
+  a resilience feature rather than a guaranteed quota increase.
 - The server sends only a compact context built from already-retrieved AIR CUE data, plus the user's question.
 - Strict grounding instructions prohibit invented readings, causes, medical diagnoses and safety guarantees.
 - Request timeout 25 s (assistant) / 20 s (insights), token caps, and per-IP rate limits are enforced.

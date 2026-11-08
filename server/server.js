@@ -80,9 +80,13 @@ app.use(errorHandler);
 
 const mode = await initStore();
 
+const copilotLabel = config.groqApiKeys.length
+  ? `enabled (${config.groqApiKeys.length} key${config.groqApiKeys.length === 1 ? '' : 's'})`
+  : 'disabled';
+
 const server = app.listen(config.port, () => {
   console.log(`[air-cue] API listening on http://localhost:${config.port} (${config.nodeEnv})`);
-  console.log(`[air-cue] Store: ${mode}. AIRCUE Copilot: ${config.groqApiKey ? 'enabled' : 'disabled'}. OpenAQ: ${config.openAqApiKey ? 'enabled' : 'disabled'}.`);
+  console.log(`[air-cue] Store: ${mode}. AIRCUE Copilot: ${copilotLabel}. OpenAQ: ${config.openAqApiKey ? 'enabled' : 'disabled'}.`);
   if (fs.existsSync(clientDist)) console.log('[air-cue] Serving built client from client/dist');
 });
 
