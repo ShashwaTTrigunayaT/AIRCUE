@@ -71,7 +71,7 @@ export default function Footer() {
         </span>
         <a
           className="footer-github"
-          href="https://github.com/ShashwaTTrigunayaT/OPEN-CUE"
+          href="https://github.com/ShashwaTTrigunayaT/AIRCUE"
           target="_blank"
           rel="noreferrer noopener"
         >
