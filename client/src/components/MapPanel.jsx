@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { CircleMarker, MapContainer, Marker, Popup, TileLayer, useMap, useMapEvents } from 'react-leaflet';
+import { Circle, CircleMarker, MapContainer, Marker, Popup, TileLayer, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import { categoryColor, STANDARD_LABELS } from '../utils/aqi.js';
 import { formatDateTime, formatNumber, shortCoords } from '../utils/format.js';
@@ -63,6 +63,7 @@ export default function MapPanel({
   onPickPoint,
   samples = [],
   pickedPoint,
+  showHeatmap = false,
 }) {
   const center = selectedLocation
     ? { latitude: selectedLocation.latitude, longitude: selectedLocation.longitude }
@@ -73,6 +74,47 @@ export default function MapPanel({
       <MapContainer center={[center.latitude, center.longitude]} zoom={5} scrollWheelZoom className="map-canvas">
         <TileLayer url={TILE_URL} attribution={ATTRIBUTION} />
         <Recenter center={center} />
+
+        {showHeatmap
+          ? cities.flatMap((city) => {
+              const block = city.aqi?.US;
+              if (!block?.valid) return [];
+              const color = categoryColor('US', block.category?.key);
+              return [
+                { radius: 70000, opacity: 0.08 },
+                { radius: 45000, opacity: 0.12 },
+                { radius: 22000, opacity: 0.16 },
+              ].map((ring) => (
+                <Circle
+                  key={`heat-${city.id}-${ring.radius}`}
+                  center={[city.latitude, city.longitude]}
+                  radius={ring.radius}
+                  pathOptions={{ stroke: false, fillColor: color, fillOpacity: ring.opacity }}
+                  interactive={false}
+                />
+              ));
+            })
+          : null}
+
+        {showHeatmap
+          ? samples
+              .filter((sample) => Number.isFinite(sample.usAqi) && Number.isFinite(sample.latitude))
+              .flatMap((sample) => {
+                const color = categoryColor('US', sample.usCategory?.key);
+                return [
+                  { radius: 9000, opacity: 0.14 },
+                  { radius: 4500, opacity: 0.2 },
+                ].map((ring) => (
+                  <Circle
+                    key={`heat-sample-${sample.latitude}-${sample.longitude}-${ring.radius}`}
+                    center={[sample.latitude, sample.longitude]}
+                    radius={ring.radius}
+                    pathOptions={{ stroke: false, fillColor: color, fillOpacity: ring.opacity }}
+                    interactive={false}
+                  />
+                ));
+              })
+          : null}
         <MapClickHandler onPickPoint={onPickPoint} />
 
         {cities.map((city) => {
@@ -146,7 +188,7 @@ export default function MapPanel({
           <CircleMarker
             center={[selectedLocation.latitude, selectedLocation.longitude]}
             radius={13}
-            pathOptions={{ color: '#0f766e', weight: 2, fillColor: '#0f766e', fillOpacity: 0.12 }}
+            pathOptions={{ color: '#0b5f58', weight: 2, fillColor: '#0b5f58', fillOpacity: 0.12 }}
           >
             <Popup>
               <div className="map-popup">
@@ -219,6 +261,11 @@ export default function MapPanel({
       </MapContainer>
 
       <div className="map-overlay">
+        {showHeatmap ? (
+          <p className="map-heat-note">
+            Modelled US AQI heat field · interpolated circles · not a measured local value
+          </p>
+        ) : null}
         <MapLegend
           items={[
             { label: 'Good', color: categoryColor('US', 'good') },

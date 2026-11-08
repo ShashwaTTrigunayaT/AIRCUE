@@ -93,6 +93,8 @@ export const api = {
   current: (location, options) => request(`/api/air/current${query(locationParams(location))}`, options),
   forecast: (location, options) => request(`/api/air/forecast${query(locationParams(location))}`, options),
   history: (location, options) => request(`/api/air/history${query(locationParams(location))}`, options),
+  anomalies: (location, options) => request(`/api/air/anomalies${query(locationParams(location))}`, options),
+  prediction: (location, options) => request(`/api/air/prediction${query(locationParams(location))}`, options),
 
   compare: (locations) =>
     request(

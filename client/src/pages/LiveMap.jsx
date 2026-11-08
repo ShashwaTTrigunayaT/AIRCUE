@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Crosshair, Database, MapPin } from 'lucide-react';
+import { Crosshair, Database, Flame, MapPin } from 'lucide-react';
 import { api } from '../services/api.js';
 import { useLocationContext } from '../context/LocationContext.jsx';
 import { useNearby } from '../hooks/useNearby.js';
 import MapPanel from '../components/MapPanel.jsx';
+import LeaderboardPanel from '../components/LeaderboardPanel.jsx';
 import CleanAirFinder from '../components/CleanAirFinder.jsx';
 import { Badge, DataBadge, ErrorState, InlineNotice, LoadingState, SectionHeading } from '../components/States.jsx';
 import { formatDateTime, formatNumber, shortCoords } from '../utils/format.js';
@@ -16,13 +17,30 @@ export default function LiveMap() {
   const [mapData, setMapData] = useState({ status: 'loading', data: null, error: null });
   const [pickedPoint, setPickedPoint] = useState(null);
   const [radius, setRadius] = useState(25000);
+  const [showHeatmap, setShowHeatmap] = useState(false);
   const nearby = useNearby(location, radius);
 
   useEffect(() => {
-    const lat = Number(searchParams.get('lat'));
-    const lon = Number(searchParams.get('lon'));
+    const latParam = searchParams.get('lat');
+    const lonParam = searchParams.get('lon');
+    // Number(null) is 0, so a missing query string must not overwrite the
+    // selected location with coordinates 0,0.
+    if (latParam === null || lonParam === null) return;
+    const lat = Number(latParam);
+    const lon = Number(lonParam);
     const name = searchParams.get('name');
-    if (Number.isFinite(lat) && Number.isFinite(lon) && lat !== location.latitude && lon !== location.longitude) {
+    // A 0,0 pair is Null Island, never a selected city — ignore it.
+    const nullIsland = Math.abs(lat) < 0.01 && Math.abs(lon) < 0.01;
+    if (
+      Number.isFinite(lat) &&
+      Number.isFinite(lon) &&
+      !nullIsland &&
+      lat >= -90 &&
+      lat <= 90 &&
+      lon >= -180 &&
+      lon <= 180 &&
+      (lat !== location.latitude || lon !== location.longitude)
+    ) {
       setLocation({
         name: name || `${lat.toFixed(2)}, ${lon.toFixed(2)}`,
         admin1: null,
@@ -103,6 +121,15 @@ export default function LiveMap() {
                 </p>
               </div>
               <div className="map-panel-actions">
+                <button
+                  type="button"
+                  className={`btn btn-small ${showHeatmap ? 'btn-secondary' : 'btn-ghost'}`}
+                  onClick={() => setShowHeatmap((value) => !value)}
+                  aria-pressed={showHeatmap}
+                >
+                  <Flame size={14} aria-hidden="true" />
+                  {showHeatmap ? 'Hide heatmap' : 'Heatmap'}
+                </button>
                 {pickedPoint ? (
                   <button type="button" className="btn btn-secondary btn-small" onClick={() => openDashboard({ ...pickedPoint, name: 'Picked point' })}>
                     <Crosshair size={14} aria-hidden="true" /> Open picked point
@@ -121,13 +148,24 @@ export default function LiveMap() {
               onPickPoint={setPickedPoint}
               pickedPoint={pickedPoint}
               samples={nearby.data?.samples || []}
+              showHeatmap={showHeatmap}
             />
+
+            {showHeatmap ? (
+              <p className="panel-note">
+                The heat layer overlays translucent circles from city-level modelled US AQI values and, when loaded,
+                Clean Air Finder samples. Colour between points is interpolated for orientation only; it is not a
+                measured local reading and should not be used as a station-level value.
+              </p>
+            ) : null}
 
             <p className="panel-note">
               {mapData.data.notes.join(' ')} Tiles © OpenStreetMap contributors; follow the OpenStreetMap tile usage
               policy for production traffic.
             </p>
           </section>
+
+          <LeaderboardPanel cities={mapData.data.cities} onSelectCity={openDashboard} />
 
           <section className="panel" aria-labelledby="stations-title">
             <SectionHeading

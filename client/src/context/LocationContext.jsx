@@ -15,6 +15,12 @@ export const DEFAULT_LOCATION = {
   source: 'default',
 };
 
+// 0,0 is Null Island in the Atlantic — never a real selected place. Older builds
+// could persist it when query parameters were missing, so reject it everywhere.
+function isNullIsland(latitude, longitude) {
+  return Math.abs(Number(latitude)) < 0.01 && Math.abs(Number(longitude)) < 0.01;
+}
+
 function isValidLocation(value) {
   return (
     value &&
@@ -24,7 +30,8 @@ function isValidLocation(value) {
     Number(value.latitude) >= -90 &&
     Number(value.latitude) <= 90 &&
     Number(value.longitude) >= -180 &&
-    Number(value.longitude) <= 180
+    Number(value.longitude) <= 180 &&
+    !isNullIsland(value.latitude, value.longitude)
   );
 }
 
@@ -44,8 +51,16 @@ function normalizeLocation(value) {
 function readStoredLocation() {
   try {
     const parsed = JSON.parse(localStorage.getItem(LOCATION_KEY) || 'null');
-    return isValidLocation(parsed) ? normalizeLocation(parsed) : DEFAULT_LOCATION;
+    if (isValidLocation(parsed)) return normalizeLocation(parsed);
+    // Drop invalid legacy values (including 0,0) so the default is used again.
+    localStorage.removeItem(LOCATION_KEY);
+    return DEFAULT_LOCATION;
   } catch {
+    try {
+      localStorage.removeItem(LOCATION_KEY);
+    } catch {
+      /* storage unavailable */
+    }
     return DEFAULT_LOCATION;
   }
 }

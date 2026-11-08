@@ -24,6 +24,33 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
+  margin: -28px -28px 24px;
+  padding: 20px 28px;
+  border-radius: calc(var(--radius) - 1px) calc(var(--radius) - 1px) 0 0;
+  background: linear-gradient(135deg, #03332f 0%, #064e45 55%, #0b5f58 100%);
+}
+
+.hero-top .eyebrow {
+  color: rgba(204, 251, 241, 0.78);
+}
+
+.hero-top h1 {
+  color: #ffffff;
+}
+
+.hero-top .hero-subtitle {
+  color: rgba(236, 253, 250, 0.82);
+}
+
+.hero-top .btn-ghost {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.hero-top .btn-ghost:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.22);
 }
 
 .hero-subtitle {
@@ -227,7 +254,7 @@
 }
 
 .dominant-conc {
-  color: #0f766e;
+  color: #0b5f58;
 }
 
 .hero-footnote {
@@ -661,7 +688,7 @@ input[type="text"]:focus {
   font-size: 1.5rem;
   font-weight: 700;
   letter-spacing: -0.02em;
-  color: #0f766e;
+  color: #0b5f58;
 }
 
 .window-day {
@@ -1009,6 +1036,7 @@ input[type="text"]:focus {
   }
   .hero-top {
     flex-direction: column;
+    margin: -28px -28px 20px;
   }
   .hero-actions {
     justify-content: flex-start;

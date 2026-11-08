@@ -160,7 +160,7 @@ modelled concentrations using CPCB breakpoints. Not an official CPCB monitoring 
 
 ---
 
-## 6. Groq (optional AI)
+## 6. AIRCUE Copilot (Groq, optional AI)
 
 Docs: https://console.groq.com/docs · OpenAI-compatible endpoint:
 `POST https://api.groq.com/openai/v1/chat/completions`
@@ -171,9 +171,22 @@ Docs: https://console.groq.com/docs · OpenAI-compatible endpoint:
 - Strict grounding instructions prohibit invented readings, causes, medical diagnoses and safety guarantees.
 - Request timeout 25 s (assistant) / 20 s (insights), token caps, and per-IP rate limits are enforced.
 - The key is server-side only. If Groq fails, the dashboard is unaffected; insights fall back to rule-based output and
-  the assistant shows a readable error.
+  AIRCUE Copilot shows a readable error.
 
 ---
+
+## 7. Derived features and their limits
+
+- **Pollution heatmap** — draws overlapping translucent circles from modelled city-level US AQI values and Clean Air
+  Finder samples. Colour between points is an orientation aid, not an interpolated measurement. Station observations
+  are never blended into the heat layer.
+- **Anomaly detection** — compares PM2.5, PM10 and US AQI with a 7-day baseline that excludes the most recent 24 hours
+  (minimum 48 valid hourly values). Baseline deviation is flagged at |z| ≥ 2; rapid change requires ≥30% between the
+  last two available hours plus a minimum absolute difference. Flags describe the supplied model series only and do not
+  identify causes or act as health warnings.
+- **Impact report and share cards** — built in the browser from the currently loaded current/history/forecast payloads.
+  Both include the AQI standard, data hour, provider and measurement type, and both avoid safety guarantees. A share
+  card is a snapshot, not a live-updating feed.
 
 ## Data integrity rules (implementation checklist)
 

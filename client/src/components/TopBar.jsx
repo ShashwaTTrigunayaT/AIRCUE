@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import { Bell, Menu, Wind, X } from 'lucide-react';
-import LocationSearch from './LocationSearch.jsx';
 import { useAlerts } from '../context/AlertsContext.jsx';
 
 const NAV_ITEMS = [
@@ -11,7 +10,7 @@ const NAV_ITEMS = [
   { to: '/compare', label: 'Compare' },
   { to: '/health', label: 'Health & Safety' },
   { to: '/forecast', label: 'Forecast' },
-  { to: '/assistant', label: 'AI Assistant' },
+  { to: '/assistant', label: 'Copilot' },
 ];
 
 export default function TopBar() {
@@ -46,7 +45,6 @@ export default function TopBar() {
         </nav>
 
         <div className="top-bar-actions">
-          
           <button
             type="button"
             className="icon-button"

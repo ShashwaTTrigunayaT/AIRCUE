@@ -1,4 +1,4 @@
-import { RefreshCw, Sparkles } from 'lucide-react';
+import { Lightbulb, RefreshCw } from 'lucide-react';
 import { useInsights } from '../hooks/useInsights.js';
 import { Badge, ErrorState, LoadingState, SectionHeading } from './States.jsx';
 import { formatDateTime } from '../utils/format.js';
@@ -26,8 +26,8 @@ export default function InsightsPanel({ location, compact = false }) {
       {status === 'ready' && data ? (
         <>
           <div className="insights-toolbar">
-            <Badge tone={data.source === 'groq' ? 'ai' : 'rules'} icon={Sparkles}>
-              {data.source === 'groq' ? `Groq · ${data.model || 'AI model'}` : 'Rule-based'}
+            <Badge tone={data.source === 'groq' ? 'ai' : 'rules'} icon={Lightbulb}>
+              {data.source === 'groq' ? 'AIRCUE Copilot' : 'Rule-based'}
             </Badge>
             <span className="insight-meta">
               {data.provider} · {data.measurementType} · data hour {formatDateTime(data.dataTimestamp, location?.timezone)}
@@ -48,7 +48,7 @@ export default function InsightsPanel({ location, compact = false }) {
           </ul>
 
           <p className="panel-note">{data.note}</p>
-          {data.aiError ? <p className="panel-note is-warning">AI service note: {data.aiError}</p> : null}
+          {data.aiError ? <p className="panel-note is-warning">Copilot note: {data.aiError}</p> : null}
         </>
       ) : null}
     </section>

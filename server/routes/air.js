@@ -7,6 +7,8 @@ import {
   buildHistoryPayload,
 } from '../services/airQuality.js';
 import { buildMapPayload } from '../services/nearby.js';
+import { detectAnomalies } from '../services/anomalies.js';
+import { predictAqi } from '../services/prediction.js';
 import { parseLocationList, parseLocationQuery } from '../middleware/validate.js';
 
 const router = Router();
@@ -27,6 +29,18 @@ router.get('/history', async (req, res) => {
   const location = parseLocationQuery(req.query);
   const series = await getAirQualitySeries(location.lat, location.lon);
   res.json(buildHistoryPayload(series, location));
+});
+
+router.get('/anomalies', async (req, res) => {
+  const location = parseLocationQuery(req.query);
+  const series = await getAirQualitySeries(location.lat, location.lon);
+  res.json(detectAnomalies(series, location));
+});
+
+router.get('/prediction', async (req, res) => {
+  const location = parseLocationQuery(req.query);
+  const series = await getAirQualitySeries(location.lat, location.lon);
+  res.json(predictAqi(series, location));
 });
 
 router.get('/compare', async (req, res) => {

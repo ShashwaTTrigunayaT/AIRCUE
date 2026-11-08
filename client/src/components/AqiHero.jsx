@@ -1,5 +1,7 @@
-import { Clock, RefreshCw, Star, TriangleAlert } from 'lucide-react';
+import { useState } from 'react';
+import { Clock, RefreshCw, Share2, Star, TriangleAlert } from 'lucide-react';
 import { Badge, DataBadge } from './States.jsx';
+import ShareCard from './ShareCard.jsx';
 import { STANDARD_LABELS, categoryColor, guidanceFor } from '../utils/aqi.js';
 import { formatDateTime, formatNumber, locationSubtitle, locationTitle, timeAgo } from '../utils/format.js';
 
@@ -40,6 +42,13 @@ export default function AqiHero({ current, standard, onSelectStandard, onSave, i
   const color = category ? categoryColor(standard, category.key) : '#64748b';
   const guidance = category ? guidanceFor(standard, category.key) : null;
   const standardMeta = STANDARD_LABELS[standard];
+  const [shareOpen, setShareOpen] = useState(false);
+  const provenance = [
+    block?.source || current.provider,
+    block?.averaging ? `averaging: ${block.averaging}` : null,
+  ]
+    .filter(Boolean)
+    .join(' · ');
 
   return (
     <section className="panel hero-panel" aria-labelledby="aqi-hero-title">
@@ -53,6 +62,11 @@ export default function AqiHero({ current, standard, onSelectStandard, onSave, i
           </p>
         </div>
         <div className="hero-actions">
+          {block?.valid ? (
+            <button type="button" className="btn btn-ghost btn-small" onClick={() => setShareOpen(true)}>
+              <Share2 size={15} aria-hidden="true" /> Share
+            </button>
+          ) : null}
           <button type="button" className="btn btn-ghost btn-small" onClick={onRefresh} disabled={refreshing}>
             <RefreshCw size={15} className={refreshing ? 'spin' : ''} aria-hidden="true" />
             {refreshing ? 'Refreshing' : 'Refresh'}
@@ -87,9 +101,7 @@ export default function AqiHero({ current, standard, onSelectStandard, onSave, i
               <DataBadge type={current.measurementType} />
               <Badge tone="muted">Fetched {timeAgo(current.fetchedAt)}</Badge>
             </div>
-            <p className="hero-provenance">
-              {block.source} · averaging: {block.averaging || 'provider-defined'} · {current.provider}
-            </p>
+            <p className="hero-provenance">{provenance}</p>
           </div>
         </div>
       ) : (
@@ -162,6 +174,8 @@ export default function AqiHero({ current, standard, onSelectStandard, onSave, i
           <em>Data sources & limitations</em> in the footer.
         </p>
       </div>
+
+      <ShareCard open={shareOpen} onClose={() => setShareOpen(false)} current={current} standard={standard} />
     </section>
   );
 }

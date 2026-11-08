@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ArrowUpRight, MapPin, Star, X } from 'lucide-react';
+import { ArrowUpRight, FileText, MapPin, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useLocationContext } from '../context/LocationContext.jsx';
 import { useAirQuality } from '../hooks/useAirQuality.js';
@@ -36,6 +36,11 @@ export default function Overview() {
             Live pollution intelligence, health guidance, forecasts and cleaner alternatives — with the source and
             measurement type always visible.
           </p>
+          <div className="page-head-actions">
+            <Link className="btn btn-ghost btn-small" to="/report">
+              <FileText size={14} aria-hidden="true" /> Impact report
+            </Link>
+          </div>
         </div>
         <div className="location-panel">
           <LocationSearch placeholder="Search a city to inspect its air…" />

@@ -12,7 +12,7 @@ import { formatClock, formatDateTime, formatNumber } from '../utils/format.js';
 
 export const FORECAST_METRICS = {
   us_aqi: { label: 'US AQI', unit: 'index', color: '#ca8a04', precision: 0 },
-  pm2_5: { label: 'PM2.5', unit: 'µg/m³', color: '#0d9488', precision: 1 },
+  pm2_5: { label: 'PM2.5', unit: 'µg/m³', color: '#0f766e', precision: 1 },
   pm10: { label: 'PM10', unit: 'µg/m³', color: '#2563eb', precision: 1 },
   nitrogen_dioxide: { label: 'NO₂', unit: 'µg/m³', color: '#7c3aed', precision: 1 },
   ozone: { label: 'O₃', unit: 'µg/m³', color: '#ea580c', precision: 1 },
@@ -85,7 +85,7 @@ export default function ForecastChart({ hourly, metric = 'us_aqi', timezone, hei
             x={data[0].label}
             stroke="rgba(15,118,110,0.55)"
             strokeDasharray="4 4"
-            label={{ value: 'Now', position: 'insideTopLeft', fill: '#0f766e', fontSize: 11 }}
+            label={{ value: 'Now', position: 'insideTopLeft', fill: '#0b5f58', fontSize: 11 }}
           />
           <Area
             type="monotone"
@@ -100,9 +100,6 @@ export default function ForecastChart({ hourly, metric = 'us_aqi', timezone, hei
           />
         </AreaChart>
       </ResponsiveContainer>
-      <p className="chart-caption">
-        Forecast values only — these hours have not happened yet. Line gaps mean the provider returned no value.
-      </p>
     </div>
   );
 }

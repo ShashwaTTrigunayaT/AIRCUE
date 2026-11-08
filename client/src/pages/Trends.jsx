@@ -5,6 +5,7 @@ import { useAirQuality } from '../hooks/useAirQuality.js';
 import TrendChart from '../charts/TrendChart.jsx';
 import { Badge, DataBadge, ErrorState, LoadingState, SectionHeading } from '../components/States.jsx';
 import ProvenancePanel from '../components/ProvenancePanel.jsx';
+import AnomalyPanel from '../components/AnomalyPanel.jsx';
 import LocationSearch from '../components/LocationSearch.jsx';
 import { formatDate, formatNumber } from '../utils/format.js';
 
@@ -153,6 +154,8 @@ export default function Trends() {
               <p>{history.change24h?.comparison || 'Comparison needs two complete periods'}</p>
             </article>
           </div>
+
+          <AnomalyPanel location={location} />
 
           {history.daily?.length ? (
             <section className="panel">

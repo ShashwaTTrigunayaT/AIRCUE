@@ -3,6 +3,7 @@ import { useLocationContext } from '../context/LocationContext.jsx';
 import { useAlerts } from '../context/AlertsContext.jsx';
 import LocationSearch from '../components/LocationSearch.jsx';
 import ForecastPanel from '../components/ForecastPanel.jsx';
+import PredictionPanel from '../components/PredictionPanel.jsx';
 import BestWindow from '../components/BestWindow.jsx';
 import AlertMonitor from '../components/AlertMonitor.jsx';
 import { Badge, DataBadge, ErrorState, InlineNotice, LoadingState, SectionHeading } from '../components/States.jsx';
@@ -71,6 +72,8 @@ export default function Forecast() {
           </div>
 
           <ForecastPanel forecast={forecast} location={location} />
+
+          <PredictionPanel location={location} />
 
           <BestWindow forecast={forecast} location={location} />
 

@@ -19,11 +19,12 @@ Express
   ├─ routes ──► services
   │              ├─ openMeteo.js   fetch + normalize hourly series (5 min cache)
   │              ├─ airQuality.js  build current / forecast / history / compare payloads
+  │              ├─ anomalies.js   statistical baseline + rapid-change analysis
   │              ├─ nearby.js      Clean Air Finder sampling + map city layer
   │              ├─ openAq.js      optional station observations (10 min cache)
   │              ├─ context.js     compact grounding context for AI
-  │              ├─ insights.js    rule-based insights + optional Groq insights
-  │              ├─ copilot.js     Groq chat with strict system prompt
+  │              ├─ insights.js    rule-based insights + optional AIRCUE Copilot insights
+  │              ├─ copilot.js     AIRCUE Copilot chat (Groq) with strict system prompt
   │              └─ store.js       MongoDB profile store or local JSON fallback
   └─ static client (SPA fallback, except /api)
 ```
@@ -104,6 +105,16 @@ compared locations).
 - **Clean Air Finder** — 24 samples (8 bearings × 35/70/100% of radius) around the origin; positioned with great-circle
   offsets; distances computed with the haversine formula; only samples with a valid provider US AQI are ranked, and only
   those at least 5 index points below the origin are shown as cleaner.
+- **Anomaly detection** (`server/services/anomalies.js`) — compares the current modelled hour for PM2.5, PM10 and US AQI
+  with a 7-day baseline that excludes the most recent 24 hours (minimum 48 valid values). Baseline deviation requires
+  |z| ≥ 2; rapid change requires ≥30% between the last two available hours plus a minimum absolute difference. Flags
+  are descriptive statistics, not causes or health warnings. Served by `GET /api/air/anomalies`.
+- **Heatmap** — client-side overlapping translucent `Circle` layers built from modelled city-level US AQI values and
+  Clean Air Finder samples. One AQI standard only; the map labels the result as interpolated for orientation, not a
+  measured surface.
+- **Impact report / share card** — both assembled from already-loaded payloads. The report adds print CSS and JSON
+  export; the share card renders a PNG locally on a canvas. Both repeat the standard, source, data hour and
+  modelled/forecast labels.
 
 ## Persistence
 
@@ -190,4 +201,5 @@ rate limits and provider error mapping are implemented server-side.
   merge observed and modelled values silently.
 - Station-based AQI: requires a documented station AQI method and sufficient pollutant coverage; the current build
   intentionally shows station concentrations without assigning an AQI category.
-- Heatmaps: require dense, geographically meaningful data and explicit interpolation labelling; deliberately omitted.
+- Heatmaps: the current layer uses labelled overlapping circles over sparse city points. A denser gridded surface may be
+  added only with explicit interpolation and uncertainty labelling; never present it as measured data.

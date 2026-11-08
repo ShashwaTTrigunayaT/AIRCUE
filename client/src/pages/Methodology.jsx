@@ -157,6 +157,39 @@ export default function Methodology() {
             </p>
           </article>
           <article>
+            <h3>Pollution heatmap</h3>
+            <p>
+              The optional heat layer on the Live Map draws overlapping translucent circles from modelled city-level
+              US AQI values, plus Clean Air Finder samples when those are loaded. It is a visual guide to broad
+              differences between model points, not an interpolated measurement surface.
+            </p>
+            <p className="method-caveat">
+              Colour between points is interpolated for orientation only. It must not be read as a street-level or
+              station-level value, and station observations are never blended into it.
+            </p>
+          </article>
+          <article>
+            <h3>Anomaly detection</h3>
+            <p>
+              Each metric is compared with a seven-day modelled baseline that excludes the most recent 24 hours
+              (minimum 48 valid hourly values). A baseline deviation is flagged at |z| ≥ 2. A rapid change is flagged
+              when the last two available hours differ by at least 30% and by a minimum absolute amount (10 µg/m³ for
+              PM2.5, 20 µg/m³ for PM10, 15 index points for US AQI).
+            </p>
+            <p className="method-caveat">
+              These are descriptive statistics about the supplied model series. They do not identify pollution causes,
+              prove a value is wrong, or act as health warnings.
+            </p>
+          </article>
+          <article>
+            <h3>Impact report & share cards</h3>
+            <p>
+              The printable report is assembled in the browser from the loaded current, history and forecast payloads.
+              Share cards are drawn locally on a canvas. Both include the AQI standard, measurement type, data hour and
+              provider, and both explicitly avoid safety guarantees.
+            </p>
+          </article>
+          <article>
             <h3>History & changes</h3>
             <p>
               History is the provider's modelled hourly series. Daily means and highest/lowest values are aggregated by
@@ -176,14 +209,14 @@ export default function Methodology() {
 
       <section className="panel">
         <SectionHeading
-          eyebrow="AI assistant"
+          eyebrow="AIRCUE Copilot"
           title="Explanation, not measurement"
-          action={<Badge tone="ai" icon={Wind}>Groq</Badge>}
+          action={<Badge tone="ai" icon={Wind}>AIRCUE Copilot</Badge>}
         />
         <p>
           When configured, the server builds a compact context from the already-retrieved AIR CUE data — location, AQI
           standard, category, pollutant values with units, timestamps, trend, forecast peak and best window — and sends
-          it to a Groq-hosted model with strict grounding instructions. The model is told to use only that context for
+          it to Groq, the provider behind AIRCUE Copilot, with strict grounding instructions. The model is told to use only that context for
           location-specific claims, name the source and measurement type, say when data is insufficient, avoid
           inventing causes, keep AQI standards distinct, and avoid medical diagnosis or safety guarantees.
         </p>
@@ -199,7 +232,7 @@ export default function Methodology() {
         <ul className="limitation-list">
           <li>No fabricated readings, station IDs, model resolutions or confidence scores.</li>
           <li>No official CPCB monitoring data is claimed; CPCB AQI here is computed from modelled values.</li>
-          <li>No interpolation presented as measured truth. A pollution heatmap is deliberately not implemented.</li>
+          <li>No interpolation presented as measured truth. Heatmap colour between city points is an orientation aid, not a measurement.</li>
           <li>No reverse-geocoded place name is invented for raw GPS coordinates; coordinates are shown instead.</li>
           <li>No claim of continuous background monitoring for alerts.</li>
           <li>No personalised medical advice and no guarantee that an activity or location is safe.</li>

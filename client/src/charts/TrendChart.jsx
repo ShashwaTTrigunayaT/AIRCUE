@@ -11,7 +11,7 @@ import {
 import { formatClock, formatDateTime, formatNumber } from '../utils/format.js';
 
 const SERIES_META = {
-  pm2_5: { label: 'PM2.5', unit: 'µg/m³', color: '#0d9488', precision: 1 },
+  pm2_5: { label: 'PM2.5', unit: 'µg/m³', color: '#0f766e', precision: 1 },
   pm10: { label: 'PM10', unit: 'µg/m³', color: '#2563eb', precision: 1 },
   us_aqi: { label: 'US AQI', unit: 'index', color: '#ca8a04', precision: 0 },
 };
@@ -88,10 +88,6 @@ export default function TrendChart({ series, metric = 'pm2_5', timezone, weekly 
           />
         </AreaChart>
       </ResponsiveContainer>
-      <p className="chart-caption">
-        Past values are modelled reanalysis/analysis fields from Open-Meteo/CAMS, not verified monitoring-station
-        observations. Line gaps mark missing values.
-      </p>
     </div>
   );
 }

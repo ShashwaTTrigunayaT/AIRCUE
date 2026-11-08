@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Lock, ShieldCheck, Sparkles } from 'lucide-react';
+import { Database, Lock, ShieldCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { api } from '../services/api.js';
 import { useLocationContext } from '../context/LocationContext.jsx';
@@ -43,10 +43,10 @@ export default function Assistant() {
     <div className="page">
       <div className="page-head">
         <div>
-          <p className="eyebrow">AI assistant</p>
-          <h1>Ask the data, not the internet.</h1>
+          <p className="eyebrow">AIRCUE Copilot</p>
+          <h1>Ask the AIRCUE Copilot.</h1>
           <p className="page-lead">
-            A grounded assistant for the selected location. It explains the current reading, forecast, trend and
+            A grounded Copilot for the selected location. It explains the current reading, forecast, trend and
             provenance that AIR CUE has already retrieved — it does not create environmental readings.
           </p>
         </div>
@@ -55,11 +55,11 @@ export default function Assistant() {
         </div>
       </div>
 
-      {status === 'loading' && !current ? <LoadingState label="Preparing the assistant context…" /> : null}
+      {status === 'loading' && !current ? <LoadingState label="Preparing AIRCUE Copilot's context…" /> : null}
       {error && !current ? (
         <InlineNotice tone="warning" title="Current data is unavailable">
-          {error} The assistant can still explain general concepts, but it cannot answer questions about live conditions
-          without data.
+          {error} AIRCUE Copilot can still explain general concepts, but it cannot answer questions about live
+          conditions without data.
         </InlineNotice>
       ) : null}
 
@@ -72,9 +72,9 @@ export default function Assistant() {
           <section className="panel panel-compact">
             <SectionHeading
               eyebrow="Context sent"
-              title="What the assistant sees"
+              title="What AIRCUE Copilot sees"
               description="Only these loaded values and provenance travel with your question."
-              action={<Sparkles size={17} aria-hidden="true" />}
+              action={<Database size={17} aria-hidden="true" />}
             />
             {primary?.valid ? (
               <dl className="context-list">
@@ -106,7 +106,7 @@ export default function Assistant() {
                 </div>
               </dl>
             ) : (
-              <p className="panel-note">No current AQI block is available, so the assistant will say the data is insufficient.</p>
+              <p className="panel-note">No current AQI block is available, so AIRCUE Copilot will say the data is insufficient.</p>
             )}
             <p className="panel-note">
               Source attribution: <Badge tone="provenance">Open-Meteo</Badge>. Station observations are not mixed in
@@ -115,22 +115,22 @@ export default function Assistant() {
           </section>
 
           <section className="panel panel-compact">
-            <SectionHeading eyebrow="Grounding" title="Rules the assistant follows" action={<ShieldCheck size={17} aria-hidden="true" />} />
+            <SectionHeading eyebrow="Grounding" title="Rules AIRCUE Copilot follows" action={<ShieldCheck size={17} aria-hidden="true" />} />
             <ul className="rule-list">
               {GROUNDING_RULES.map((rule) => (
                 <li key={rule}>{rule}</li>
               ))}
             </ul>
             <InlineNotice tone="info" title="Privacy & keys">
-              <Lock size={13} aria-hidden="true" /> The Groq API key stays on the server. Your question and the compact
-              data context are sent to Groq for the answer.
+              <Lock size={13} aria-hidden="true" /> AIRCUE Copilot runs on Groq. The API key stays on the server;
+              your question and the compact data context are sent to Groq for the answer.
             </InlineNotice>
           </section>
 
           <section className="panel panel-compact">
             <SectionHeading eyebrow="No AI configured?" title="The rest still works" />
             <p className="panel-note">
-              The AI assistant is optional. Dashboard, map, forecast, history, comparison, Clean Air Finder and alerts
+              AIRCUE Copilot is optional. Dashboard, map, forecast, history, comparison, Clean Air Finder and alerts
               work without any AI key. Insights fall back to rule-based explanations of the loaded data.
             </p>
             <Link className="btn btn-ghost btn-small" to="/methodology">

@@ -7,11 +7,11 @@ const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 export function copilotStatus() {
   return {
     enabled: Boolean(config.groqApiKey),
-    provider: 'Groq',
+    provider: 'AIRCUE Copilot',
     model: config.groqApiKey ? config.groqModel : null,
     reason: config.groqApiKey
       ? null
-      : 'The AI assistant is disabled because GROQ_API_KEY is not configured on the server. All other AIR CUE features work without it, and insights fall back to rule-based explanations of the loaded data.',
+      : 'AIRCUE Copilot is disabled because GROQ_API_KEY is not configured on the server. All other AIR CUE features work without it, and insights fall back to rule-based explanations of the loaded data.',
   };
 }
 
@@ -26,7 +26,7 @@ const GROUNDING_RULES = `GROUNDING RULES (mandatory):
 8. Do not speculate about pollution causes (such as traffic, crop burning or fireworks) unless the context explicitly identifies a cause.
 9. Be concise: at most 180 words, plain language, short paragraphs or bullets. No markdown tables.`;
 
-const SYSTEM_PROMPT = `You are the AIR CUE Copilot, embedded in an air-quality intelligence app that turns pollution data into practical decisions.
+const SYSTEM_PROMPT = `You are the AIRCUE Copilot, embedded in the AIR CUE air-quality intelligence app that turns pollution data into practical decisions.
 
 ${GROUNDING_RULES}
 10. If the data timestamp is older than three hours, mention that the data may be stale.`;
@@ -53,7 +53,7 @@ export async function groqChat({ messages, temperature = 0.2, maxTokens = 550, t
     }),
   }).catch((error) => {
     if (error?.status === 401 || error?.status === 403) {
-      throw new HttpError(502, 'AI_AUTH_FAILED', 'Groq rejected the configured API key, so the AI assistant is unavailable.');
+      throw new HttpError(502, 'AI_AUTH_FAILED', 'Groq rejected the configured API key, so AIRCUE Copilot is unavailable.');
     }
     if (error?.status === 429) {
       throw new HttpError(503, 'AI_RATE_LIMITED', 'The AI provider rate limit was reached. Try again in a moment.');
@@ -92,7 +92,7 @@ export async function askCopilot({ question, context }) {
   return {
     answer: content,
     model,
-    provider: 'Groq',
+    provider: 'AIRCUE Copilot',
     generatedAt: new Date().toISOString(),
   };
 }

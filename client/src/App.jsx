@@ -11,6 +11,7 @@ import Health from './pages/Health.jsx';
 import Forecast from './pages/Forecast.jsx';
 import Assistant from './pages/Assistant.jsx';
 import Methodology from './pages/Methodology.jsx';
+import ImpactReport from './pages/ImpactReport.jsx';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -34,6 +35,7 @@ export default function App() {
           <Route path="/health" element={<Health />} />
           <Route path="/forecast" element={<Forecast />} />
           <Route path="/assistant" element={<Assistant />} />
+          <Route path="/report" element={<ImpactReport />} />
           <Route path="/methodology" element={<Methodology />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

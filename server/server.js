@@ -82,7 +82,7 @@ const mode = await initStore();
 
 const server = app.listen(config.port, () => {
   console.log(`[air-cue] API listening on http://localhost:${config.port} (${config.nodeEnv})`);
-  console.log(`[air-cue] Store: ${mode}. AI assistant: ${config.groqApiKey ? 'enabled' : 'disabled'}. OpenAQ: ${config.openAqApiKey ? 'enabled' : 'disabled'}.`);
+  console.log(`[air-cue] Store: ${mode}. AIRCUE Copilot: ${config.groqApiKey ? 'enabled' : 'disabled'}. OpenAQ: ${config.openAqApiKey ? 'enabled' : 'disabled'}.`);
   if (fs.existsSync(clientDist)) console.log('[air-cue] Serving built client from client/dist');
 });
 
