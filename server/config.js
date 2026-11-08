@@ -5,14 +5,22 @@ const num = (value, fallback) => {
   return Number.isFinite(parsed) ? parsed : fallback;
 };
 
-const splitGroqKeys = (value) =>
+const splitList = (value) =>
   String(value || '')
     .split(/[\s,;]+/)
-    .map((key) => key.trim())
+    .map((item) => item.trim())
     .filter(Boolean);
 
 const groqApiKeys = [
-  ...new Set([...splitGroqKeys(process.env.GROQ_API_KEYS), ...splitGroqKeys(process.env.GROQ_API_KEY)]),
+  ...new Set([...splitList(process.env.GROQ_API_KEYS), ...splitList(process.env.GROQ_API_KEY)]),
+];
+
+const groqModel = process.env.GROQ_MODEL || 'openai/gpt-oss-120b';
+const groqModels = [
+  ...new Set([
+    groqModel,
+    ...splitList(process.env.GROQ_FALLBACK_MODELS || 'llama-3.1-8b-instant,openai/gpt-oss-20b'),
+  ]),
 ];
 
 export const config = {
@@ -20,7 +28,9 @@ export const config = {
   nodeEnv: process.env.NODE_ENV || 'development',
   groqApiKeys,
   groqApiKey: groqApiKeys[0] || '',
-  groqModel: process.env.GROQ_MODEL || 'openai/gpt-oss-120b',
+  groqModel,
+  groqModels,
+  groqFallbackModels: groqModels.slice(1),
   openAqApiKey: process.env.OPENAQ_API_KEY || '',
   mongodbUri: process.env.MONGODB_URI || '',
   mongodbDb: process.env.MONGODB_DB || 'aircue',
