@@ -170,6 +170,10 @@ Docs: https://console.groq.com/docs · OpenAI-compatible endpoint:
 - `GROQ_API_KEYS` accepts a comma/newline-separated key pool. Requests rotate keys, and a rejected, rate-limited,
   timed-out or failed key falls back to the next one. Keys in the same Groq organization may share limits, so this is
   a resilience feature rather than a guaranteed quota increase.
+- `GROQ_MODEL` is tried first, then `GROQ_FALLBACK_MODELS` in order when the model is unavailable or its quota is
+  exhausted. The current free-plan caps for the available general chat models (`openai/gpt-oss-120b`,
+  `openai/gpt-oss-20b`, `qwen/qwen3.8-27b`) are 30 RPM, 1,000 RPD, 8K TPM and 200K TPD per organization; verify the
+  live values on Groq's rate-limits page because plan limits can change.
 - The server sends only a compact context built from already-retrieved AIR CUE data, plus the user's question.
 - Strict grounding instructions prohibit invented readings, causes, medical diagnoses and safety guarantees.
 - Request timeout 25 s (assistant) / 20 s (insights), token caps, and per-IP rate limits are enforced.

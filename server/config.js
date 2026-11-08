@@ -19,7 +19,7 @@ const groqModel = process.env.GROQ_MODEL || 'openai/gpt-oss-120b';
 const groqModels = [
   ...new Set([
     groqModel,
-    ...splitList(process.env.GROQ_FALLBACK_MODELS || 'llama-3.1-8b-instant,openai/gpt-oss-20b'),
+    ...splitList(process.env.GROQ_FALLBACK_MODELS || 'openai/gpt-oss-20b,qwen/qwen3.8-27b'),
   ]),
 ];
 

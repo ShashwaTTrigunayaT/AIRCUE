@@ -122,7 +122,8 @@ Copy `.env.example` to `.env`. All integrations are optional:
 | `PORT` | API/production server port (default `5000`) |
 | `GROQ_API_KEYS` | Comma/newline-separated Groq key pool; requests rotate keys and fall back to the next key on auth, rate-limit, 5xx or timeout failures |
 | `GROQ_API_KEY` | Single-key alternative, merged into `GROQ_API_KEYS` and deduplicated |
-| `GROQ_MODEL` | Groq model (default `openai/gpt-oss-120b`; verify in the Groq console) |
+| `GROQ_MODEL` | Primary Groq model (default `openai/gpt-oss-120b`; verify in the Groq console) |
+| `GROQ_FALLBACK_MODELS` | Comma-separated fallback chat models tried in order (default `openai/gpt-oss-20b,qwen/qwen3.8-27b`) |
 | `OPENAQ_API_KEY` | Enables ground-level monitoring station observations |
 | `MONGODB_URI` | Enables MongoDB persistence for saved locations and alerts |
 | `MONGODB_DB` | Database name (default `aircue`) |
@@ -135,6 +136,24 @@ prediction, rule-based insights, voice (browser-dependent) and provenance all re
 does not require an API key and the prediction model runs locally on the server.
 
 **Secrets stay server-side.** No provider key is exposed through `VITE_*` variables or shipped to the browser.
+
+### Groq model fallback
+
+`GROQ_MODEL` is tried first; if that model is unavailable or exhausted, `GROQ_FALLBACK_MODELS` are tried in
+order. The fallback also runs after a key-level rate limit, so a different model may still answer when one model's
+quota is exhausted.
+
+| Model | Free-plan limits | Notes |
+| --- | --- | --- |
+| `openai/gpt-oss-120b` | 30 RPM · 1,000 RPD · 8K TPM · 200K TPD | Primary |
+| `openai/gpt-oss-20b` | 30 RPM · 1,000 RPD · 8K TPM · 200K TPD | Fallback |
+| `qwen/qwen3.8-27b` | 30 RPM · 1,000 RPD · 8K TPM · 200K TPD | Fallback; preview model |
+| `llama-3.1-8b-instant` | Enterprise only (contact sales) | Not in the free/developer catalog; add only if your account lists it |
+
+The three chat models above are the available general-purpose text models on the verified key. Whisper/TTS,
+prompt-guard, safety-classifier and Arabic-specialized models are not used as chat fallbacks. Limits apply at the
+**organization** level, not per key, and can be overridden by Groq. Check the current values in the Groq console
+Limits page; the Developer plan has substantially higher limits.
 
 ### MongoDB (optional)
 
