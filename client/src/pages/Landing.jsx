@@ -93,14 +93,14 @@ export default function Landing() {
 
         <div className="landing-hero-main">
           <div className="landing-copy">
-            <h1 id="landing-title" sty>
+            <h1 id="landing-title">
               Understand the air.
               <br />
-              Own your decisions.
+              Own <span className="landing-accent">your decisions.</span>
             </h1>
 
             <p className="landing-description">
-              Real-time air quality intelligence, predictive insights, and cleaner-air recommendation helping you
+              Real-time air quality intelligence, predictive insights, and cleaner-air recommendations helping you
               make smarter decisions about the air you breathe.
             </p>
           </div>
