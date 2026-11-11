@@ -74,7 +74,7 @@ export default function LiveMap() {
 
   function openDashboard(next) {
     setLocation({ ...next, source: 'map' });
-    navigate('/');
+    navigate('/overview');
   }
 
   return (

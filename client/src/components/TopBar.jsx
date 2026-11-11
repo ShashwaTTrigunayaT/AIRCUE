@@ -4,7 +4,7 @@ import { Bell, Menu, Wind, X } from 'lucide-react';
 import { useAlerts } from '../context/AlertsContext.jsx';
 
 const NAV_ITEMS = [
-  { to: '/', label: 'Overview', end: true },
+  { to: '/overview', label: 'Overview' },
   { to: '/map', label: 'Live Map' },
   { to: '/trends', label: 'Historical Trends' },
   { to: '/compare', label: 'Compare' },

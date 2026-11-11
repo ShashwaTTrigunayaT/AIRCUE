@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { ArrowUp, ExternalLink } from 'lucide-react';
 
 const EXPLORE_LINKS = [
+  { to: '/overview', label: 'Live dashboard' },
   { to: '/map', label: 'Live map' },
   { to: '/trends', label: 'Historical trends' },
   { to: '/compare', label: 'Compare locations' },

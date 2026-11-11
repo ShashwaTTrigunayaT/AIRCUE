@@ -3,6 +3,9 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import TopBar from './components/TopBar.jsx';
 import Footer from './components/Footer.jsx';
 import AlertDrawer from './components/AlertDrawer.jsx';
+import CopilotLauncher from './components/CopilotLauncher.jsx';
+import FusedHeaderAligner from './components/FusedHeaderAligner.jsx';
+import Landing from './pages/Landing.jsx';
 import Overview from './pages/Overview.jsx';
 import LiveMap from './pages/LiveMap.jsx';
 import Trends from './pages/Trends.jsx';
@@ -22,13 +25,18 @@ function ScrollToTop() {
 }
 
 export default function App() {
+  const { pathname } = useLocation();
+  const isLanding = pathname === '/';
+
   return (
     <div className="app-shell">
       <ScrollToTop />
-      <TopBar />
+      <FusedHeaderAligner />
+      {!isLanding ? <TopBar /> : null}
       <main id="main" className="app-main">
         <Routes>
-          <Route path="/" element={<Overview />} />
+          <Route path="/" element={<Landing />} />
+          <Route path="/overview" element={<Overview />} />
           <Route path="/map" element={<LiveMap />} />
           <Route path="/trends" element={<Trends />} />
           <Route path="/compare" element={<Compare />} />
@@ -40,8 +48,9 @@ export default function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
-      <Footer />
-      <AlertDrawer />
+      {!isLanding ? <Footer /> : null}
+      {!isLanding ? <CopilotLauncher /> : null}
+      {!isLanding ? <AlertDrawer /> : null}
     </div>
   );
 }
